@@ -8,6 +8,6 @@ MIT
 
 # External resources
 
-JsOrrery - MIT
-Bootstrap - MIT
-Helious HTML5UP Design - Creative Commons
+- JsOrrery - MIT
+- Bootstrap - MIT
+- Helious HTML5UP Design - Creative Commons
