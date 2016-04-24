@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/3.1.0/anchor.min.js"></script>
+    
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://bootswatch.com/cyborg/bootstrap.min.css" rel="stylesheet" type="text/css">
+    
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+<style type="text/css">
+  a{
+    color:white;
+  }
+  a:hover{
+    color:white;
+  }
+  a:active{
+    color:white;
+  }
+  a:focus {
+    color:white;
+  }
+</style>
+    <title>AstroMine Search</title>
+    <script type="html/template" id="asteroid-entry">
+      <div class="row">
+          <div class="col-xs-11 ">
+              <h4 class="asteroid-name" id="ateroid-"><small>Subtext for header</small><a href="#"><span>Name</span></a></h4>
+              <p class="desc">Content</p>
+              <p class="els lead"></p>
+              <table class="table">
+                <tr>
+                  <td>Radius</td>
+                  <td class="size"></td>
+                </tr>
+                <tr>
+                  <td>Proximity</td>
+                  <td class="proximity"></td>
+                </tr>
+                <tr>
+                  <td>Risk</td>
+                  <td class="feasibility"></td>
+                </tr>
+              </table>
+              <p><a class="btn btn-default" href="#" target="_top" role="button">More Data &raquo;</a>
+              </p>
+          </div>
+      </div>
+    </script>
+
+    <script type="text/javascript">
+      var lorem_ipsum = 'Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui';
+      /*
+          size: km
+          feasibility: percentage [0; 1]
+          proximity: astronomic units
+          minerals: list of periodic elements
+      */
+      var sorting = {
+        sized: 'desc',
+        feasibility: 'asc',
+        proximity: 'asc',
+      }
+      var asteroids_db = {
+        ryugu:{
+          name:"Ryugu",
+          desc:"The most cool asteroid we reckon",
+          size: 0.49,
+          feasibility: 0.1499,
+          proximity: 0.396,
+          minerals: ["nickel", "iron", "cobalt", "water", "nitrogen", "hydrogen", "ammonia"]
+        },
+
+        _1989ml:{
+          name:"1989 ML",
+          desc:"An asteroid",
+          size: 0.3,
+          feasibility: 0.1197,
+          proximity: 0.445,
+          minerals: ["nickel", "iron", "cobalt"]
+        },
+
+        nereus:{
+          name:"Nereus",
+          desc:"An asteroid",
+          size: 0.33,
+          feasibility: 0.4301,
+          proximity: 0.026,
+          minerals: ["nickel", "iron", "cobalt"]
+        },
+
+        _2011uw158:{
+          name:"2011 UW158",
+          desc:"An asteroid",
+          size: 0.3,
+          feasibility: 0.1517,
+          proximity: 0.267,
+          minerals: ["platinum", "nickel", "iron", "cobalt"]
+        },
+
+        anteros:{
+          name:"Anteros",
+          desc:"An asteroid",
+          size: 1.3,
+          feasibility: 0.5892,
+          proximity: 0.274,
+          minerals: ["magnesium silicate", "aluminium", "iron silicate"]
+        },
+
+        _2001cc21:{
+          name:"2001 CC21",
+          desc:"An asteroid",
+          size: 0.43,
+          feasibility: 0.1998,
+          proximity: 0.222,
+          minerals: ["magnesium silicate", "aluminium", "iron silicate"]
+        },
+
+        _1992tc:{
+          name:"1992 TC",
+          desc:"An asteroid",
+          size: 1.09,
+          feasibility: 0.5971,
+          proximity: 0.392,
+          minerals: ["nickel", "iron", "cobalt"]
+        },
+
+        _2001sg10:{
+          name:"2001 SG10",
+          desc:"An asteroid",
+          size: 0.165,
+          feasibility: 0.3823,
+          proximity: 0.194,
+          minerals: ["nickel", "iron", "cobalt"]
+        },
+
+        _2002do3:{
+          name:"2002 DO3",
+          desc:"An asteroid",
+          size: 0.087,
+          feasibility: 1,
+          proximity: 0.432,
+          minerals: ["nickel", "iron", "cobalt"]
+        },
+
+        seleucus:{
+          name:"Seleucus",
+          desc:"An asteroid",
+          size: 1.4,
+          feasibility: 0.270,
+          proximity: 0.443,
+          minerals: ["nickel", "iron", "cobalt", "water", "nitrogen", "hydrogen", "ammonia"]
+        }
+
+      
+      }
+      $(function(){
+        anchors.options = {
+          placement: 'left',
+          visible: 'hover ',
+          icon: '#'
+        };
+        anchors.add('.asteroid-name');
+
+
+        $('input[name=gridRadios]').change(function () {
+          make_search();
+        });
+        $('#search').submit(function(e) {
+          
+          e.preventDefault();
+
+          make_search();
+          return false;
+        });
+
+      });
+
+      function make_search(argument) {
+        var sort = $('input[name=gridRadios]:checked', '#search').val()
+        var sortable = [];
+        for (var i in asteroids_db) {
+          if(asteroids_db[i].minerals.indexOf($('#mineral').val()) != -1){
+
+            sortable.push([i, asteroids_db[i]])
+          }
+        }
+        if(sorting[sort]=='asc'){
+          sortable.sort(function(a, b) {return a[1][sort] - b[1][sort]})
+        } else {
+          sortable.sort(function(a, b) {return b[1][sort] - a[1][sort]})
+        }
+
+        $('#content').html('');
+        for (var i = 0; i < sortable.length; i++) {
+          add_entry(i, sortable[i][1]);
+        }
+       // anchors.add('.asteroid-name');
+
+      }
+
+      function add_entry(index, entry) {
+        //entry.desc = lorem_ipsum;
+
+        var template = $('#asteroid-entry').html().trim();
+        $('#content').append(template);
+        var our_element = $('#content .row:last-child');
+
+        our_element.attr("id", "asteroid-" + entry.name)
+        $('h4 a',our_element).attr("href", "javascript:popupAsteroid('"+entry.name+"')")
+
+        $('h4 small', our_element).html((index+1)+". ");
+        $('h4 span', our_element).html(entry.name);
+        $('p.desc', our_element).html(entry.desc);
+        $('p.els', our_element).html("Elements: "+entry.minerals.join(', '));
+        $('.size', our_element).html(entry.size+" km");
+        $('.feasibility', our_element).html(entry.feasibility);
+        $('.proximity', our_element).html(entry.proximity + " au");
+        $('a.btn',our_element).attr("href", "/db#"+entry.name+"")
+      }
+      function popupAsteroid(name) {
+         window.top.postMessage(name, '*');
+
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <form class="" id="search" name="search" role="form">
+        <div class="form-group  ">
+          <div class="col-xs-10">
+            <input type="text" class="form-control" id="mineral" placeholder="Search mineral">
+          </div>  
+          <div class="col-xs-2">
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-search "></i></button>
+          </div>
+        </div>
+        
+        
+        <div class="container">
+        <div class="row">
+        <div class="col-xs-12">
+          <div class="form-group">
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="gridRadios" id="gridRadios1" value="size" checked>
+                    Radius of asteroid
+                  </label>
+                </div>
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="gridRadios" id="gridRadios2" value="proximity">
+                    Proximity to Earth
+                  </label>
+                </div>
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="gridRadios" id="gridRadios3" value="feasibility" >
+                    Risk
+                  </label>
+                </div>
+            </div>
+        </div>
+        <!--
+        <div class="col-xs-6">
+          <div class="form-group">
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" name="gridRadios" id="gridRadios1" value="option1" checked>
+                    Fuel availability
+                  </label>
+                </div>
+            </div>
+        </div>
+        -->
+        </div>
+        </div>
+      </form>
+      </div>
+    <div class="container" id="content">
+      <hr>
+    <div class="container">
+      <p class="lead">Go for it! Search up minerals which come to mind!</p>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <hr>
+        
+      <footer>
+          <p>&copy; AstroMine 2016</p>
+      </footer>
+    </div>
+
+  </body>
+</html>
